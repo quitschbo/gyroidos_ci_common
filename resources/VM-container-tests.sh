@@ -119,6 +119,7 @@ wait_vm () {
 }
 
 start_vm() {
+	ls -lh ${PROCESS_NAME}.img
 	qemu-system-x86_64 -machine accel=kvm,vmport=off -m 64G -smp 4 -cpu host -bios OVMF.fd \
 		-monitor unix:./${PROCESS_NAME}.qemumon,server,nowait \
 		-name trustme-tester,process=${PROCESS_NAME} -nodefaults -nographic \
@@ -955,6 +956,9 @@ else
 	echo "STATUS: Testing image at $(pwd)/tmp/deploy/images/genericx86-64/trustme_image/trustmeimage.img"
 	rsync tmp/deploy/images/genericx86-64/trustme_image/trustmeimage.img ${PROCESS_NAME}.img
 fi
+
+# print size of image
+ls -lh ${PROCESS_NAME}.img
 
 # Prepare image for test with physical tokens
 if ! [[ -z "${SCHSM}" ]]
