@@ -101,7 +101,25 @@ do_test_complete() {
 
 	cmd_control_stop_error_notrunning "${CONTAINER}" "$TESTPW"
 
+	# Perform extended update test (triggers reload)
+	if [[ -f "${CONTAINER}_rename.conf" ]]; then
+		# direct reload
+		cmd_control_update_config "${CONTAINER} /tmp/${CONTAINER}_rename.conf /tmp/${CONTAINER}_rename.sig /tmp/${CONTAINER}_rename.cert" "name: \"${CONTAINER}-rename\""
 
+		cmd_control_start "${CONTAINER}-rename" "$TESTPW"
+
+		# indirect reload, trigger internal out-of-sync state
+		cmd_control_update_config "${CONTAINER}-rename /tmp/${CONTAINER}_update.conf /tmp/${CONTAINER}_update.sig /tmp/${CONTAINER}_update.cert" "name: \"${CONTAINER}\""
+
+		# trigger reload
+		cmd_control_stop_after_rename "${CONTAINER}-rename" "${CONTAINER}" "$TESTPW"
+
+		# test if reload worked
+		cmd_control_start "${CONTAINER}" "$TESTPW"
+
+		cmd_control_stop "${CONTAINER}" "$TESTPW"
+	fi
+	#
 	# Perform additional tests in second run
 	if [[ "${SECOND_RUN}" == "y" ]];then
 
@@ -429,6 +447,8 @@ if ! [[ -z "${SCHSM}" ]];then
 	echo_status "VM USB Devices:"
 	ssh ${SSH_OPTS} 'lsusb' 2>&1
 	STAGE="RUN2"
+
+	do_copy_configs
 fi
 
 # List test containers
