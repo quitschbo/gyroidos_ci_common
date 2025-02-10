@@ -24,7 +24,7 @@ def call(Map target = [:]) {
 
 			rsync -v -e "ssh -v" -r --ignore-existing --no-devices --no-specials --no-links "${target.workspace}/out-${target.buildtype}/downloads/" ${env.MIRRORHOST}:"\$SOURCES"
 
-			ssh -v ${env.MIRRORHOST} "mkdir \$ATTIC"
+			ssh -v ${env.MIRRORHOST} "mkdir -p \$ATTIC"
 
 			ssh -v ${env.MIRRORHOST} "find \$SSTATE -mindepth 1 -maxdepth 1 -exec mv '{}' \$ATTIC \\;"
 
